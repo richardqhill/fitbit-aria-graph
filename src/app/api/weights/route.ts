@@ -2,8 +2,7 @@
 import 'server-only';
 
 import { NextResponse } from 'next/server';
-
-import { getAuthSession } from "@/app/api/auth/[...nextauth]/route";
+import { getAuthSession } from "@/auth";
 
 interface WeightEntry {
     dateTime: string;
