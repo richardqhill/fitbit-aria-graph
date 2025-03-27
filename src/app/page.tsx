@@ -7,17 +7,15 @@ import { useSession } from "next-auth/react";
 
 import Login from "@/components/Login";
 
-interface WeightEntry {
-  dateTime: string;
-  value: number;
-}
+import { LineEntry } from '@/types/api';
 
 export default function WeightGraph() {
   const { data: session } = useSession();
 
-  const [weightData, setWeightData] = useState<WeightEntry[]>([]);
-  const [filteredWeightData, setFilteredWeightData] = useState<WeightEntry[]>([]);
-  const [startRange, setStartRange] = useState("All Time")
+  const [weightData, setWeightData] = useState<LineEntry[]>([]);
+  const [filteredWeightData, setFilteredWeightData] = useState<LineEntry[]>([]);
+
+  const [startRange, setStartRange] = useState("Last 30 Days")
 
   useEffect(() => {
     async function fetchWeights() {
@@ -25,8 +23,8 @@ export default function WeightGraph() {
         try {
           const res = await fetch('/api/weights');
           const data = await res.json();
-          if (data.weights) {
-            setWeightData(data.weights);
+          if (data.weightData) {
+            setWeightData(data.weightData);
           } else {
             console.error('Failed to get weights');
           }
@@ -40,15 +38,13 @@ export default function WeightGraph() {
 
   useEffect(() => {
     if (startRange === "All Time") {
-      setFilteredWeightData(weightData);
+      setWeightData(weightData)
       return;
     }
 
     setFilteredWeightData(weightData.filter((x) => {
       const pointDate = new Date(x.dateTime)
-
       const startDate = new Date();
-      startDate.setHours(0, 0, 0, 0);
       if (startRange === "Last 3 Months") {
         startDate.setMonth(startDate.getMonth() - 3);
       } else if (startRange === "Last 30 Days") {
@@ -58,7 +54,6 @@ export default function WeightGraph() {
       return pointDate > startDate;
     }))
   }, [weightData, startRange]);
-
 
   class CustomizedAxisTick extends PureComponent<{ x: number; y: number; payload: { value: string | number } }> {
     render() {
@@ -101,7 +96,8 @@ export default function WeightGraph() {
           <XAxis dataKey="dateTime" height={60} tick={({ x, y, payload }) => <CustomizedAxisTick x={x} y={y} payload={payload} />}/>
           <YAxis domain={([dataMin, dataMax]) => [Math.floor(dataMin - 10), Math.ceil(dataMax + 10)] }/>
           <Tooltip wrapperStyle={{ color: "black" }}/>
-          <Line type="monotone" dataKey="value" stroke="#8884d8" strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey="trendlineValue" stroke="#8884d8" strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey="logWeight" stroke="none" dot={{ stroke: 'white', strokeWidth: 4 }} />
         </LineChart>
       </ResponsiveContainer>
     </div>
