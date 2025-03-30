@@ -10,10 +10,29 @@ export default function Login() {
       {session ? (
         <div>
           <p>Welcome, {session.user?.name}</p>
-          <button onClick={() => signOut()}>Logout</button>
+          <button 
+            onClick={() => signOut()}
+            style={{
+              padding: "8px 16px",
+              border: "2px solid #6c757d",
+              borderRadius: 8,
+              color: "#d1d5db",
+            }}>
+              Logout
+          </button>
         </div>
       ) : (
-        <button onClick={() => signIn("fitbit")}>Login with Fitbit</button>
+        <button 
+          onClick={() => signIn("fitbit")}
+          style={{
+            padding: "8px 16px",
+            border: "2px solid #6c757d",
+            borderRadius: 8,
+            backgroundColor: "#4c6e85",
+            color: "#d1d5db",
+          }}>
+            Login with Fitbit
+        </button>
       )}
     </div>
   );

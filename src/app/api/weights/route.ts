@@ -3,6 +3,7 @@ import 'server-only';
 
 import { NextResponse } from 'next/server';
 import { getAuthSession } from "@/auth";
+import fs from 'fs';
 
 import { TrendlineEntry, LogEntry, LineEntry } from '@/types/api';
 
@@ -10,7 +11,11 @@ export async function GET() {
     try {
         const session = await getAuthSession();
         if (!session || !session.accessToken) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+            const dummyWeightData = fs.readFileSync('./src/data/weightData.json').toString();;
+            return NextResponse.json({ 
+                weightData: JSON.parse(dummyWeightData),
+            });
+            // return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
         const weightData = await getWeightData(session.accessToken);

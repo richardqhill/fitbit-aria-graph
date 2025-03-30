@@ -19,18 +19,16 @@ export default function WeightGraph() {
 
   useEffect(() => {
     async function fetchWeights() {
-      if (session?.accessToken) {
-        try {
-          const res = await fetch('/api/weights');
-          const data = await res.json();
-          if (data.weightData) {
-            setWeightData(data.weightData);
-          } else {
-            console.error('Failed to get weights');
-          }
-        } catch (error) {
-          console.error('Error fetching weights:', error);
+      try {
+        const res = await fetch('/api/weights');
+        const data = await res.json();
+        if (data.weightData) {
+          setWeightData(data.weightData);
+        } else {
+          console.error('Failed to get weights');
         }
+      } catch (error) {
+        console.error('Error fetching weights:', error);
       }
     };
     fetchWeights();
@@ -38,7 +36,7 @@ export default function WeightGraph() {
 
   useEffect(() => {
     if (startRange === "All Time") {
-      setWeightData(weightData)
+      setFilteredWeightData(weightData)
       return;
     }
 
@@ -72,7 +70,7 @@ export default function WeightGraph() {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Weight Tracker</h1>
+      <h1 className="text-xl font-bold mb-4">Fitbit Weights</h1>
       <Login/>
       <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 1 }}>
         {["All Time", "Last 3 Months", "Last 30 Days"].map((label, index) => (
@@ -81,23 +79,35 @@ export default function WeightGraph() {
             onClick={() => setStartRange(label)}
             style={{
               marginRight: index !== 2 ? 8 : 0, // No margin on the last button
-              padding: "6px 12px",
-              border: "2px solid black",
-              borderRadius: 4
+              padding: "8px 16px",
+              border: "2px solid #6c757d", // Dark gray border for a subtle look
+              borderRadius: 8,
+              backgroundColor: startRange === label ? "#4c6e85" : "transparent", // Highlight selected date range
+              color: "#d1d5db", // Light text for readability
+              cursor: "pointer",
+              transition: "background-color 0.3s ease",
+            }}
+            onMouseEnter={(e) => {
+              const target = e.target as HTMLButtonElement; // Explicitly cast to HTMLButtonElement
+              target.style.backgroundColor = "#2d3d4f"; // Hover effect
+            }}
+            onMouseLeave={(e) => {
+              const target = e.target as HTMLButtonElement; // Explicitly cast to HTMLButtonElement
+              target.style.backgroundColor = startRange === label ? "#4c6e85" : "transparent"; // Reset to original state
             }}
           >
             {label}
           </button>
         ))}
       </div>
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={400} className="mt-6">
         <LineChart data={filteredWeightData} margin={{ bottom: 50 }}>
           <CartesianGrid strokeDasharray="1 1" />
           <XAxis dataKey="dateTime" height={60} tick={({ x, y, payload }) => <CustomizedAxisTick x={x} y={y} payload={payload} />}/>
           <YAxis domain={([dataMin, dataMax]) => [Math.floor(dataMin - 10), Math.ceil(dataMax + 10)] }/>
           <Tooltip wrapperStyle={{ color: "black" }}/>
           <Line type="monotone" dataKey="trendlineValue" stroke="#8884d8" strokeWidth={2} dot={false} />
-          <Line type="monotone" dataKey="logWeight" stroke="none" dot={{ stroke: 'white', strokeWidth: 4 }} />
+          <Line type="monotone" dataKey="logWeight" stroke="none" dot={startRange === "All Time" ? false : { stroke: 'white', strokeWidth: 4 }} />
         </LineChart>
       </ResponsiveContainer>
     </div>

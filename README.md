@@ -1,13 +1,12 @@
 ## Fitbit Weight Graph
 
-I got annoyed that Google stopped providing a web dashboard to view scale weigh-ins, instead forcing users to use the Fitbit app.
+I was annoyed when Google stopped providing a web dashboard to view your weight data.
 
-Here's a next.js app that lets you view your weigh-ins
+I spun up a simple next.js app to view my weigh-ins.
 
-TODO:  
-[] deploy to vercel  
-[] better webpage styling  
-[] use fitbit log route to get actual values instead of trendline (database?)  
+Demo:  
+
+<img src="docs/demo.gif" width="500"> 
 
 ## Getting Started
 Create your fitbit app at https://dev.fitbit.com/apps/  
