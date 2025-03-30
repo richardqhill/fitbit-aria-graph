@@ -5,6 +5,7 @@ I was annoyed when Google stopped providing a web dashboard to view your weight 
 I spun up a simple next.js app to view my weigh-ins.
 
 Demo:  
+https://aria-graph.vercel.app/  
 
 <img src="docs/demo.gif" width="500"> 
 
@@ -13,6 +14,9 @@ Create your fitbit app at https://dev.fitbit.com/apps/
 
 Redirect URL format:
 `http://localhost:3000/api/auth/callback/fitbit`
+
+or if deploying on vercel:
+`https://XXXXX.vercel.app/api/auth/callback/fitbit`
 
 ## .env file
 ```bash
