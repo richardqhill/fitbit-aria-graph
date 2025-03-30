@@ -11,7 +11,7 @@ export async function GET() {
     try {
         const session = await getAuthSession();
         if (!session || !session.accessToken) {
-            const dummyWeightData = fs.readFileSync('./src/data/weightData.json').toString();;
+            const dummyWeightData = fs.readFileSync(process.cwd() + '/src/data/weightData.json', 'utf8').toString();;
             return NextResponse.json({ 
                 weightData: JSON.parse(dummyWeightData),
             });
