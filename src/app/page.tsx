@@ -101,11 +101,27 @@ export default function WeightGraph() {
         ))}
       </div>
       <ResponsiveContainer width="100%" height={400} className="mt-6">
-        <LineChart data={filteredWeightData} margin={{ bottom: 50 }}>
+        <LineChart data={filteredWeightData} margin={{ top: 20, right: 40, left: 40, bottom: 50 }}>
           <CartesianGrid strokeDasharray="1 1" />
           <XAxis dataKey="dateTime" height={60} tick={({ x, y, payload }) => <CustomizedAxisTick x={x} y={y} payload={payload} />}/>
           <YAxis domain={([dataMin, dataMax]) => [Math.floor(dataMin - 10), Math.ceil(dataMax + 10)] }/>
-          <Tooltip wrapperStyle={{ color: "black" }}/>
+          <Tooltip
+            wrapperStyle={{ color: "black" }}
+            content={({ active, payload }) => {
+              if (active && payload && payload.length) {
+                const logWeightData = payload.find((p) => p.dataKey === "logWeight");
+                if (logWeightData) {
+                  return (
+                    <div className="bg-white p-2 shadow-md rounded-md">
+                      <p>{`Weight: ${logWeightData.value}`}</p>
+                      <p>{`Date: ${logWeightData.payload.dateTime}`}</p>
+                    </div>
+                  );
+                }
+              }
+              return null; // Hide tooltip for other lines
+            }}
+          />
           <Line type="monotone" dataKey="trendlineValue" stroke="#8884d8" strokeWidth={2} dot={false} />
           <Line type="monotone" dataKey="logWeight" stroke="none" dot={startRange === "All Time" ? false : { stroke: 'white', strokeWidth: 4 }} />
         </LineChart>
