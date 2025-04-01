@@ -103,7 +103,7 @@ export default function WeightGraph() {
       <ResponsiveContainer width="100%" height={400} className="mt-6">
         <LineChart data={filteredWeightData} margin={{ top: 20, right: 40, left: 40, bottom: 50 }}>
           <CartesianGrid strokeDasharray="1 1" />
-          <XAxis dataKey="dateTime" height={60} tick={({ x, y, payload }) => <CustomizedAxisTick x={x} y={y} payload={payload} />}/>
+          <XAxis dataKey="dateTime" height={60}   tick={({ x, y, payload }) => <CustomizedAxisTick x={x} y={y} payload={payload} />}/>
           <YAxis domain={([dataMin, dataMax]) => [Math.floor(dataMin - 10), Math.ceil(dataMax + 10)] }/>
           <Tooltip
             wrapperStyle={{ color: "black" }}

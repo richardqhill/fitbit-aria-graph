@@ -1,4 +1,42 @@
-import { NextAuthOptions, getServerSession } from "next-auth";
+import { NextAuthOptions, getServerSession, ExtendedToken, FitbitAccount } from "next-auth";
+
+async function refreshAccessToken(token: ExtendedToken) {
+  try {
+    const response = await fetch("https://api.fitbit.com/oauth2/token", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(
+          `${process.env.FITBIT_CLIENT_ID}:${process.env.FITBIT_CLIENT_SECRET}`
+        ).toString("base64")}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: token.refreshToken,
+      }),
+    });
+
+    const refreshedTokens = await response.json();
+
+    if (!response.ok) {
+      throw new Error("Failed to refresh token");
+    }
+
+    return {
+      ...token,
+      accessToken: refreshedTokens.access_token,
+      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
+      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
+    };
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
+
+    return {
+      ...token,
+      error: "RefreshAccessTokenError",
+    };
+  }
+}
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -28,9 +66,19 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
       async jwt({ token, account }) {
         if (account) {
-          token.accessToken = account.access_token;
-          token.refreshToken = account.refresh_token;
+          const fitbitAccount = account as FitbitAccount;
+
+          return {
+            accessToken: fitbitAccount.access_token,
+            accessTokenExpires: Date.now() + fitbitAccount.expires_in * 1000,
+            refreshToken: fitbitAccount.refresh_token,
+          };
         }
+  
+        if (Date.now() > (token.accessTokenExpires as number)) {
+          return await refreshAccessToken(token as unknown as ExtendedToken);
+        }
+        
         return token;
       },
       async session({ session, token }) {
