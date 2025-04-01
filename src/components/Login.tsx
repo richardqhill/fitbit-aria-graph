@@ -9,7 +9,6 @@ export default function Login() {
     <div>
       {session ? (
         <div>
-          <p>Welcome, {session.user?.name}</p>
           <button 
             onClick={() => signOut()}
             style={{
